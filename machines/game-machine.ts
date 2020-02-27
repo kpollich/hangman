@@ -10,12 +10,12 @@ interface GameSchema {
 }
 
 type GameEvent =
-  | { type: "SUBMIT_WORD"; word: string }
+  | { type: "SUBMIT_WORD"; answer: string }
   | { type: "GUESS_LETTER"; letter: string }
   | { type: "RESET" };
 
 interface GameContext {
-  word: string;
+  answer: string;
   guessedLetters: string[];
   incorrectLetters: string[];
   maxGuesses: number;
@@ -28,7 +28,7 @@ const gameMachine = Machine<GameContext, GameSchema, GameEvent>(
   {
     id: "game",
     context: {
-      word: "",
+      answer: "",
       guessedLetters: [],
       incorrectLetters: [],
       maxGuesses: 6
@@ -40,7 +40,7 @@ const gameMachine = Machine<GameContext, GameSchema, GameEvent>(
           SUBMIT_WORD: {
             actions: [
               assign({
-                word: (ctx, e) => (ctx.word = e.word)
+                answer: (ctx, e) => (ctx.answer = e.answer)
               })
             ],
             target: "playing"
@@ -56,8 +56,16 @@ const gameMachine = Machine<GameContext, GameSchema, GameEvent>(
           GUESS_LETTER: {
             actions: [
               assign({
-                guessedLetters: (ctx, e) =>
-                  (ctx.guessedLetters = ctx.guessedLetters.concat(e.letter))
+                guessedLetters: (ctx, e) => {
+                  return ctx.guessedLetters.concat(e.letter);
+                },
+                incorrectLetters: (ctx, e) => {
+                  if (!ctx.answer.includes(e.letter)) {
+                    return ctx.incorrectLetters.concat(e.letter);
+                  }
+
+                  return ctx.incorrectLetters;
+                }
               })
             ]
           }
@@ -69,7 +77,7 @@ const gameMachine = Machine<GameContext, GameSchema, GameEvent>(
             target: "new",
             actions: [
               assign({
-                word: ctx => (ctx.word = "h"),
+                answer: ctx => (ctx.answer = "h"),
                 guessedLetters: ctx => (ctx.guessedLetters = [])
               })
             ]
@@ -82,7 +90,7 @@ const gameMachine = Machine<GameContext, GameSchema, GameEvent>(
             target: "new",
             actions: [
               assign({
-                word: ctx => (ctx.word = "h"),
+                answer: ctx => (ctx.answer = "h"),
                 guessedLetters: ctx => (ctx.guessedLetters = [])
               })
             ]
@@ -94,13 +102,13 @@ const gameMachine = Machine<GameContext, GameSchema, GameEvent>(
   {
     guards: {
       isWon: ctx => {
-        return ctx.word
+        return ctx.answer
           .split("")
           .every(letter => ctx.guessedLetters.includes(letter));
       },
       isLost: ctx => {
         return (
-          ctx.guessedLetters.filter(letter => !ctx.word.includes(letter))
+          ctx.guessedLetters.filter(letter => !ctx.answer.includes(letter))
             .length === ctx.maxGuesses
         );
       }

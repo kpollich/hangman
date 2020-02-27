@@ -8,12 +8,12 @@ interface Props {
   send: GameEventSend;
 }
 
-const SubmitWordForm: React.FunctionComponent<Props> = ({ state, send }) => {
+const SubmitAnswer: React.FunctionComponent<Props> = ({ state, send }) => {
   return (
     <Form
       initialValues={{ word: "" }}
       onFinish={values => {
-        send({ type: "SUBMIT_WORD", word: values.word.trim() });
+        send({ type: "SUBMIT_WORD", answer: values.word.trim() });
       }}
     >
       <h2>Enter a word</h2>
@@ -35,4 +35,4 @@ const SubmitWordForm: React.FunctionComponent<Props> = ({ state, send }) => {
   );
 };
 
-export default SubmitWordForm;
+export default SubmitAnswer;

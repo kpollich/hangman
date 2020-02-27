@@ -5,9 +5,9 @@ import { NextPage } from "next";
 import { Button } from "antd";
 
 import gameMachine from "../machines/game-machine";
-import SubmitWordForm from "../components/SubmitWordForm";
-import GuessLetterForm from "../components/GuessLetterForm";
-import MaskedWord from "../components/MaskedWord";
+import SubmitAnswer from "../components/SubmitAnswer";
+import GuessLetter from "../components/GuessLetter";
+import MaskedAnswer from "../components/MaskedAnswer";
 
 const PageWrapper = styled.div`
   margin: 2rem;
@@ -20,14 +20,15 @@ const HomePage: NextPage = () => {
     <PageWrapper>
       <h1>Play Hangman</h1>
 
-      {state.value === "new" && <SubmitWordForm state={state} send={send} />}
+      {state.value === "new" && <SubmitAnswer state={state} send={send} />}
       {state.value === "playing" && (
         <>
-          <MaskedWord
-            word={state.context.word}
+          <MaskedAnswer
+            word={state.context.answer}
             guessedLetters={state.context.guessedLetters}
           />
-          <GuessLetterForm state={state} send={send} />
+
+          <GuessLetter state={state} send={send} />
         </>
       )}
 
